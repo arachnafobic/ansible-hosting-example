@@ -1,12 +1,8 @@
-[]: {{{1
 
     File        : README.md
     Maintainer  : Remco v. Hest <remco@arachnafobic.org>
 
-[]: }}}1
-
 ### Description
-[]: {{{1
 
     Ansible Hosting Example
     
@@ -20,10 +16,8 @@
       - Each host has access to 2 Major php versions (5.6 + 7.0, 7.1, 7.2)
       - Each site has a default working wordpress deployed on it.
 
-[]: }}}1
 
 ### Usage
-[]: {{{1
 
     Get the vms up and running, and run the playbook with the following
 
@@ -34,5 +28,3 @@
     
     At the end of the playbook, the final task will output all the urls for each
     installed site, using xip.io.
-
-[]: }}}1
