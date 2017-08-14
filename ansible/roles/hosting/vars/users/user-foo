@@ -1,0 +1,40 @@
+---
+
+user-foo:
+  name: foo
+  comment: A comment for user foo
+  state: present
+  shell: /bin/bash
+  mysql:
+   login: foo
+   pass:  foo-mysql
+   dbs:
+     - foo
+   perms:
+     - foo.*:ALL
+  sites:
+    - sitename: site1
+      sitevhost:
+        - foo-site1.*
+      active: true
+      php: 7.0
+      wordpress:
+        preinstall: true
+        title: Foo's site1
+        login: foo
+        email: foo@example.com
+        pass: fooWP
+        mysql_db: foo
+    - sitename: site2
+      sitevhost:
+        - foo-site2.*
+        - foo-extra2.*
+      active: true
+      php: 5.6
+      wordpress:
+        preinstall: true
+        title: Foo's site2
+        login: foo
+        email: foo@example.com
+        pass: fooWP
+        mysql_db: foo

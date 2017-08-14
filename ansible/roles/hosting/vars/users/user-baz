@@ -1,0 +1,40 @@
+---
+
+user-baz:
+  name: baz
+  comment: A comment for user baz
+  state: present
+  shell: /bin/bash
+  mysql:
+   login: baz
+   pass:  baz-mysql
+   dbs:
+     - baz
+   perms:
+     - baz.*:ALL
+  sites:
+    - sitename: site1
+      sitevhost:
+        - baz-site1.*
+      active: true
+      php: 7.2
+      wordpress:
+        preinstall: true
+        title: Baz's site1
+        login: baz
+        email: baz@example.com
+        pass: bazWP
+        mysql_db: baz
+    - sitename: site2
+      sitevhost:
+        - baz-site2.*
+        - baz-extra2.*
+      active: true
+      php: 5.6
+      wordpress:
+        preinstall: true
+        title: Baz's site2
+        login: baz
+        email: baz@example.com
+        pass: bazWP
+        mysql_db: baz

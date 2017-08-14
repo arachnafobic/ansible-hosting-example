@@ -1,0 +1,39 @@
+---
+
+# For example purposes, our users per host are defined in the host_vars
+# and the info per user sits in hosting/vars/users/
+#
+# In an actual play, both the ['users'] array and ['user-<username>'] one
+# could be filled using a local_action reading out whatever infrastructure you use.
+# For example, reading out an etcd or ldap and using set_fact: to populate the arrays.
+
+- name:            "Fetch required info for users"
+  include_vars:    "users/user-{{ item }}"
+  with_items:
+    - "{{ hostvars[inventory_hostname]['users'] }}"
+
+- include:          setup-users.yml
+  when:             hostvars[inventory_hostname]['user-'+item_user] is defined
+  with_items:
+    - "{{ hostvars[inventory_hostname]['users'] }}"
+  loop_control:
+    loop_var: item_user
+
+- include:          setup-mysql.yml
+  when:             hostvars[inventory_hostname]['user-'+item_user]['mysql'] is defined
+  with_items:
+    - "{{ hostvars[inventory_hostname]['users'] }}"
+  loop_control:
+    loop_var: item_user
+
+- include:          setup-sites.yml
+  when:             hostvars[inventory_hostname]['user-'+item_user]['sites'] is defined
+  with_items:
+    - "{{ hostvars[inventory_hostname]['users'] }}"
+  loop_control:
+    loop_var: item_user
+
+
+# For example purpose only
+- name: available urls after running this playbook
+  debug: var=site_urls.split(' ')

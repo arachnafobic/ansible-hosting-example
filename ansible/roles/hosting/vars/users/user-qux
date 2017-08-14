@@ -1,0 +1,42 @@
+---
+
+user-qux:
+  name: qux
+  comment: A comment for user qux
+  state: present
+  shell: /bin/bash
+  mysql:
+   login: qux
+   pass:  qux-mysql
+   dbs:
+     - qux
+     - qux2
+   perms:
+     - qux.*:ALL
+     - qux2.*:ALL
+  sites:
+    - sitename: site1
+      sitevhost:
+        - qux-site1.*
+        - qux-extra1.*
+      active: true
+      php: 7.2
+      wordpress:
+        preinstall: true
+        title: Qux's site1
+        login: qux
+        email: qux@example.com
+        pass: quxWP
+        mysql_db: qux
+    - sitename: site2
+      sitevhost:
+        - qux-site2.*
+      active: true
+      php: 5.6
+      wordpress:
+        preinstall: true
+        title: Qux's site1
+        login: qux
+        email: qux@example.com
+        pass: quxWP
+        mysql_db: qux2

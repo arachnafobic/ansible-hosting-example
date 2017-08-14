@@ -1,0 +1,74 @@
+.
+├── ansible
+│   ├── ansible.cfg
+│   ├── inventories
+│   │   └── hosts
+│   ├── playbooks
+│   │   ├── group_vars
+│   │   │   ├── Debian
+│   │   │   ├── Debian_jessie
+│   │   │   └── Debian_stretch
+│   │   ├── host_vars
+│   │   │   ├── vm-debian8
+│   │   │   │   ├── setup
+│   │   │   │   └── users
+│   │   │   └── vm-debian9
+│   │   │       ├── setup
+│   │   │       └── users
+│   │   └── play.yml
+│   ├── roles
+│   │   ├── hosting
+│   │   │   ├── files
+│   │   │   │   └── keys
+│   │   │   │       ├── bar.pub
+│   │   │   │       ├── baz.pub
+│   │   │   │       ├── foo.pub
+│   │   │   │       └── qux.pub
+│   │   │   ├── handlers
+│   │   │   │   └── main.yml
+│   │   │   ├── tasks
+│   │   │   │   ├── main.yml
+│   │   │   │   ├── setup-mysql.yml
+│   │   │   │   ├── setup-sites.yml
+│   │   │   │   ├── setup-users.yml
+│   │   │   │   └── setup-wp.yml
+│   │   │   ├── templates
+│   │   │   │   ├── fpm.pool.j2
+│   │   │   │   └── nginx.conf.j2
+│   │   │   └── vars
+│   │   │       └── users
+│   │   │           ├── user-bar
+│   │   │           ├── user-baz
+│   │   │           ├── user-foo
+│   │   │           └── user-qux
+│   │   ├── hosting.yml
+│   │   ├── mariadb
+│   │   │   └── tasks
+│   │   │       └── main.yml
+│   │   ├── mariadb.yml
+│   │   ├── nginx
+│   │   │   └── tasks
+│   │   │       └── main.yml
+│   │   ├── nginx.yml
+│   │   ├── php-fpm
+│   │   │   └── tasks
+│   │   │       └── main.yml
+│   │   └── php-fpm.yml
+│   └── run.sh
+├── keygen.sh
+├── keys
+│   ├── bar
+│   ├── bar.pub
+│   ├── baz
+│   ├── baz.pub
+│   ├── foo
+│   ├── foo.pub
+│   ├── qux
+│   └── qux.pub
+├── scripts
+│   └── provision.sh
+├── shared
+├── tree.txt
+└── Vagrantfile
+
+25 directories, 46 files

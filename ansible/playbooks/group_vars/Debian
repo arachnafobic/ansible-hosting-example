@@ -1,0 +1,19 @@
+---
+
+# defaults, 
+# use Debian_<distro> if package names differ between releases,
+# or use host_vars to overwrite specifics on a host by host basis
+
+pkgs_nginx:
+  - nginx-full
+
+pkgs_mariadb:
+  - mariadb-server
+  - python-mysqldb
+
+pkgs_phpfpm:
+  - php7.0-cli
+  - php7.0-fpm
+
+pkgs_extra:
+  - curl

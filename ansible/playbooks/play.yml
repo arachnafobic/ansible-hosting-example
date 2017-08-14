@@ -1,0 +1,42 @@
+---
+
+# take inventory
+# always include this when using tags!
+- name:             Gather facts and create dynamic groups before we start
+  hosts:            all
+  become:           true
+  become_user:      root
+  gather_facts:     true
+  tags:             gather
+  tasks:
+     - group_by:     key={{ ansible_distribution }}
+       changed_when: false
+     - group_by:     key={{ ansible_distribution }}_{{ ansible_distribution_release }}
+       changed_when: false
+
+# go time
+- name:             Running Plays now
+  hosts:            all
+  become:           true
+  become_user:      root
+  gather_facts:     false
+
+- include: ../roles/nginx.yml
+  tags: [services, nginx]
+  vars:
+    targets: nginx
+
+- include: ../roles/mariadb.yml
+  tags: [services, mariadb]
+  vars:
+    targets: mariadb
+
+- include: ../roles/php-fpm.yml
+  tags: [services, php-fpm, php]
+  vars:
+    targets: php
+
+- include: ../roles/hosting.yml
+  tags: [hosting]
+  vars:
+    targets: hosting

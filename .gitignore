@@ -1,0 +1,12 @@
+*~
+*.swp
+*.retry
+
+/*.box
+/.ssh-config
+/.vagrant
+/shared
+/keys/*
+/ansible/roles/hosting/files/keys/*
+
+!.gitkeep

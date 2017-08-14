@@ -1,0 +1,44 @@
+---
+
+- name:            "Create site folders for {{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}"
+  file:             path="/home/{{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}/sites/{{ item.sitename }}"
+                    state=directory
+                    owner="{{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}"
+                    group="{{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}"
+                    mode=0775
+  when:             item.sitename is defined
+  with_items:
+    - "{{ hostvars[inventory_hostname]['user-'+item_user]['sites'] }}"
+
+- name:            "Add {{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}'s sites to fpm pools"
+  template:         src=fpm.pool.j2
+                    dest="/etc/php/{{ item.php }}/fpm/pool.d/{{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}-{{ item.sitename }}.conf"
+  when:             item.sitename is defined
+  with_items:
+    - "{{ hostvars[inventory_hostname]['user-'+item_user]['sites'] }}"
+  notify:          "restart php{{ item.php }}-fpm"
+
+- name:            "Add vhosts for {{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}'s sites"
+  template:         src=nginx.conf.j2
+                    dest=/etc/nginx/sites-available/{{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}-{{ item.sitename }}.conf
+  when:             item.sitename is defined
+  with_items:
+    - "{{ hostvars[inventory_hostname]['user-'+item_user]['sites'] }}"
+  notify:           reload nginx
+
+- name:            "Enable/Disable vhost for {{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}'s sites"
+  file:             src=/etc/nginx/sites-available/{{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}-{{ item.sitename }}.conf
+                    dest=/etc/nginx/sites-enabled/{{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}-{{ item.sitename }}.conf
+                    state="{% if item.active %}link{% else %}absent{% endif %}"
+  when:             item.sitename is defined
+  with_items:
+    - "{{ hostvars[inventory_hostname]['user-'+item_user]['sites'] }}"
+  notify:           reload nginx
+
+- name:            "Optionale run wordpress install for {{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}'s sites"
+  include:          setup-wp.yml
+  when:             item_site.wordpress is defined and item_site.wordpress['preinstall'] == true
+  with_items:
+    - "{{ hostvars[inventory_hostname]['user-'+item_user]['sites'] }}"
+  loop_control:
+    loop_var: item_site

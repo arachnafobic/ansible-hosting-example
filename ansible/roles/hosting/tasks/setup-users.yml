@@ -1,0 +1,22 @@
+---
+
+- name:            "Create user {{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}"
+  user:             name="{{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}"
+                    comment="{{ hostvars[inventory_hostname]['user-'+item_user]['comment'] }}"
+                    state="{{ hostvars[inventory_hostname]['user-'+item_user]['state'] }}"
+                    shell="{{ hostvars[inventory_hostname]['user-'+item_user]['shell'] }}"
+
+- name:            "chmod/chown {{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}'s homedir"
+  file:             path="/home/{{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}/"
+                    state=directory 
+                    owner="{{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}"
+                    group=www-data
+                    mode=0750
+
+# For example purposes, our user pubkeys are located in hosting/files/keys/
+# In a real use, the pub string could be fed out of a local etcd or ldap
+# depending on your infrastructure.
+
+- name:            "Populate authorized_keys with {{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}'s pubkey"
+  authorized_key:   key="{{ lookup('file',"files/keys/"+hostvars[inventory_hostname]['user-'+item_user]['name']+".pub") }}"
+                    user="{{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}"

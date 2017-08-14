@@ -1,0 +1,65 @@
+---
+
+- name:             run handlers now
+  meta:             flush_handlers
+
+- name:             install extra packages to setup wordpress
+  apt:              name={{ item }}
+                    state=present
+  with_items:       "{{ pkgs_extra }}"
+
+- name:             Download wordpress
+  get_url:          url=https://wordpress.org/latest.tar.gz
+                    dest=/tmp/wordpress-latest.tar.gz
+                    mode=0644
+
+- name:            "unpack wordpress for user {{ hostvars[inventory_hostname]['user-'+item_user]['name'] }} site {{ item_site.sitename }}"
+  unarchive:        src=/tmp/wordpress-latest.tar.gz
+                    dest="/home/{{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}/sites/{{ item_site.sitename }}/"
+                    owner="{{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}"
+                    group="{{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}"
+                    extra_opts="--strip-components=1"
+                    remote_src=yes
+                    creates="/home/{{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}/sites/{{ item_site.sitename }}/wp-login.php"
+
+- name:             rename config php
+  command:         "mv /home/{{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}/sites/{{ item_site.sitename }}/wp-config-sample.php /home/{{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}/sites/{{ item_site.sitename }}/wp-config.php
+                    creates=/home/{{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}/sites/{{ item_site.sitename }}/wp-config.php
+                    removes=/home/{{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}/sites/{{ item_site.sitename }}/wp-config-sample.php"
+
+- name:             setup defines in config php
+  lineinfile:       dest="/home/{{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}/sites/{{ item_site.sitename }}/wp-config.php"
+                    state=present
+                    regexp="^define\(\'{{ item.key }}\'"
+                    line="define('{{ item.key }}', '{{ item.value }}');"
+                    insertafter=EOF
+  with_items:
+    - { key: DB_NAME, value: "{{ item_site.wordpress.mysql_db }}" }
+    - { key: DB_USER, value: "{{ hostvars[inventory_hostname]['user-'+item_user]['mysql']['login'] }}" }
+    - { key: DB_PASSWORD, value: "{{ hostvars[inventory_hostname]['user-'+item_user]['mysql']['pass'] }}" }
+
+
+- name:             setup table_prefix in config php
+  lineinfile:       dest="/home/{{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}/sites/{{ item_site.sitename }}/wp-config.php"
+                    state=present
+                    regexp="^\$table_prefix"
+                    line="$table_prefix  = 'wp_{{ item_site.sitename }}_';"
+                    insertafter=EOF
+
+- name:            "setup wordpress {{ item_site.sitename }} for user {{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}"
+  become_user:     "{{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}"
+  shell:           "curl http://{{ item_site.sitevhost[0]|replace('.*', '') }}.{{ hostvars[inventory_hostname]['ansible_eth1']['ipv4']['address'] }}.xip.io/wp-admin/install.php?step=2 \
+                      --data-urlencode 'weblog_title={{ item_site.wordpress.title|forceescape }}' \
+                      --data-urlencode 'user_name={{ item_site.wordpress.login }}' \
+                      --data-urlencode 'admin_email={{ item_site.wordpress.email }}' \
+                      --data-urlencode 'admin_password={{ item_site.wordpress.pass|forceescape }}' \
+                      --data-urlencode 'admin_password2={{ item_site.wordpress.pass|forceescape }}' \
+                      --data-urlencode 'pw_weak=1' > /home/{{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}/sites/{{ item_site.sitename }}/.installed 2>&1
+                    creates=/home/{{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}/sites/{{ item_site.sitename }}/.installed"
+
+# For example purposes
+- name:             collect available urls
+  set_fact:
+    site_urls:  "{{ site_urls|default('') }} http://{{ item|replace('.*', '') }}.{{ hostvars[inventory_hostname]['ansible_eth1']['ipv4']['address'] }}.xip.io/"
+  with_items:
+    - "{{ item_site.sitevhost }}"

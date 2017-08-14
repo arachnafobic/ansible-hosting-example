@@ -1,0 +1,17 @@
+;  {{ ansible_managed }}
+
+[{{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}-{{ item.sitename }}]
+user = {{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}
+group = {{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}
+listen = /var/run/php/php{{ item.php}}-fpm-{{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}-{{ item.sitename }}.sock
+listen.owner = www-data
+listen.group = www-data
+php_admin_value[disable_functions] = exec,passthru,shell_exec,system
+php_admin_flag[allow_url_fopen] = off
+chdir = /home/{{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}/sites/{{ item.sitename }}/
+
+pm = dynamic
+pm.max_children = 5
+pm.start_servers = 2
+pm.min_spare_servers = 1
+pm.max_spare_servers = 3

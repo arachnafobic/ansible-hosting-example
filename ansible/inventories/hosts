@@ -1,0 +1,16 @@
+vm-debian8    ansible_host=127.0.0.1 ansible_port=2210 ansible_user=vagrant ansible_ssh_private_key_file=../.vagrant/machines/vm-debian8/virtualbox/private_key ansible_ssh_common_args="-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o PasswordAuthentication=no"
+vm-debian9    ansible_host=127.0.0.1 ansible_port=2220 ansible_user=vagrant ansible_ssh_private_key_file=../.vagrant/machines/vm-debian9/virtualbox/private_key ansible_ssh_common_args="-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o PasswordAuthentication=no"
+
+[hosting]
+vm-debian8
+vm-debian9
+
+[nginx:children]
+hosting
+
+[php:children]
+hosting
+
+[mariadb:children]
+hosting
+

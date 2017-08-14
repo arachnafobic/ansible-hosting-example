@@ -1,0 +1,9 @@
+---
+
+pkgs_phpfpm:
+  - php7.0-cli
+  - php7.0-fpm
+  - php7.0-mysql
+  - php5.6-cli
+  - php5.6-fpm
+  - php5.6-mysql

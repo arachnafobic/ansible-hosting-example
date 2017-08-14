@@ -1,0 +1,25 @@
+# {{ ansible_managed }}
+
+server {
+  listen      80;
+  server_name {{ item.sitevhost|join(' ') }};
+
+  access_log  /var/log/nginx/access-{{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}-{{ item.sitename }}.log;
+  error_log   /var/log/nginx/error-{{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}-{{ item.sitename }}.log;
+
+  root /home/{{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}/sites/{{ item.sitename }}/;
+  index index.php index.html index.htm;
+
+  location / {
+    try_files $uri $uri/ =404;
+  }
+
+  location ~ \.php$ {
+    try_files $uri =404;
+    fastcgi_split_path_info ^(.+\.php)(/.+)$;
+    fastcgi_pass unix:/var/run/php/php{{ item.php}}-fpm-{{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}-{{ item.sitename }}.sock;
+    fastcgi_index index.php;
+    fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    include fastcgi_params;
+  }
+}

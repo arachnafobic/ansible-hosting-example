@@ -1,0 +1,15 @@
+---
+
+- name:            "Create mysql db(s) for user {{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}"
+  mysql_db:         name="{{ item }}"
+                    state=present
+  when:             hostvars[inventory_hostname]['user-'+item_user]['mysql']['login'] is defined
+  with_items:
+    - "{{ hostvars[inventory_hostname]['user-'+item_user]['mysql']['dbs'] }}"
+
+- name:            "Create mysql login for user {{ hostvars[inventory_hostname]['user-'+item_user]['name'] }}"
+  mysql_user:       name="{{ hostvars[inventory_hostname]['user-'+item_user]['mysql']['login'] }}"
+                    password="{{ hostvars[inventory_hostname]['user-'+item_user]['mysql']['pass'] }}"
+                    priv="{{ hostvars[inventory_hostname]['user-'+item_user]['mysql']['perms']|join('/') }}"
+                    state=present
+  when:             hostvars[inventory_hostname]['user-'+item_user]['mysql']['login'] is defined
